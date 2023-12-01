@@ -6,6 +6,9 @@ import { Ionicons, Entypo } from '@expo/vector-icons'
 const Tab = createBottomTabNavigator()
 
 const MainTabNavigator = () => {
+
+
+
     return (
         <Tab.Navigator initialRouteName='Chats' screenOptions={{
             tabBarStyle: { backgroundColor: 'whitesmoke' },
@@ -15,19 +18,20 @@ const MainTabNavigator = () => {
             <Tab.Screen
                 name='Chats'
                 component={ChatsScreen}
-                options={{
+                options={({navigation}) => ({
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name='ios-chatbubbles-sharp' size={size} color={color} />
                     ),
                     headerRight: () => (
-                        <Entypo 
+                        <Entypo
                             name='new-message'
                             size={25}
                             color={'royalblue'}
-                            style={{marginRight: 15}}
+                            style={{ marginRight: 15 }}
+                            onPress={() => navigation.navigate('Contacts')}
                         />
                     )
-                }}
+                })}
 
             />
             <Tab.Screen name='Status' component={NotImplementedScreen} options={{ tabBarIcon: ({ color, size }) => <Ionicons name='logo-whatsapp' size={size} color={color} /> }} />
