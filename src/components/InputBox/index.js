@@ -1,6 +1,7 @@
 import { View, TextInput, StyleSheet } from 'react-native'
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const InputBox = () => {
 
@@ -12,7 +13,7 @@ const InputBox = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['bottom']} >
 
             <AntDesign name='plus' size={20} color='royalblue' />
 
@@ -20,7 +21,7 @@ const InputBox = () => {
 
             <MaterialIcons style={styles.send} name='send' size={16} color='white' onPress={onSend} />
 
-        </View>
+        </SafeAreaView>
     )
 }
 
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
         padding: 6,
         paddingHorizontal: 10,
         alignItems: 'center',
-        marginBottom: -49   //MAYBE ITS NEEDS TO REMOVE FROM HERE
+        // marginBottom: -20   //MAYBE ITS NEEDS TO REMOVE FROM HERE
     },
     input: {
         flex: 1,
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         borderColor: 'lightgray',
         borderWidth: StyleSheet.hairlineWidth,
-        marginHorizontal: 10
+        marginHorizontal: 10,
     },
     send: {
         backgroundColor: 'royalblue',

@@ -1,17 +1,27 @@
 import { ImageBackground, StyleSheet, FlatList, KeyboardAvoidingView, Platform } from 'react-native'
+import { useRoute, useNavigation } from '@react-navigation/native'
 import Mesagge from '../components/Message'
 import InputBox from '../components/InputBox'
 
 import bg from '../../assets/images/BG.png'
 import messages from '../../assets/data/messages.json'
+import { useEffect } from 'react'
 
 const ChatScreen = () => {
+
+    const route = useRoute()
+    const navigation = useNavigation()
+
+    useEffect(() => {
+        navigation.setOptions({ title: route.params.name })
+    }, [route.params.name])
+
     return (
 
-        // <KeyboardAvoidingView
-        //     // behavior={Platform.OS === 'android' ? 'height' : 'padding'}
-        //     style={styles.bgSpace}
-        // >
+        <KeyboardAvoidingView
+            // behavior={Platform.OS === 'ios' ? 60 : 90}
+            style={styles.bg}
+        >
             <ImageBackground source={bg} style={styles.bg}>
                 <FlatList
                     data={messages}
@@ -21,7 +31,7 @@ const ChatScreen = () => {
                 />
                 <InputBox />
             </ImageBackground>
-        // </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -31,10 +41,6 @@ const styles = StyleSheet.create({
     },
     list: {
         padding: 10
-    },
-    bgSpace: {
-        flex: 1,
-        marginBottom: -50
     }
 })
 
