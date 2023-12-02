@@ -14,7 +14,7 @@ const ContactListItem = ({ user }) => {
                 source={{ uri: user.image }}
                 style={styles.image}
             />
-            <View>
+            <View style={styles.content}>
                 <Text numberOfLines={1} style={styles.name}>{user.name}</Text>
                 <Text numberOfLines={2} style={styles.subTitle}>{user.status}</Text>
             </View>
@@ -44,6 +44,9 @@ const styles = StyleSheet.create({
     subTitle:{
         color: 'gray'
     },
+    content: {
+        flex: 1
+    }
 
 
 })
