@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, View, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { API, graphqlOperation, Auth } from 'aws-amplify'
 import { createChatRoom, createUserChatRoom } from '../../graphql/mutations'
+import { getCommonChatRoomWithUser } from '../../services/chatRoomService'
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -9,33 +10,42 @@ dayjs.extend(relativeTime)
 
 const ContactListItem = ({ user }) => {
 
-    
+
     const navigation = useNavigation()
-    
+
     const onPress = async () => {
 
-        const newChatRoomData = await API.graphql(graphqlOperation(createChatRoom, { input: {}}))
+        const existingChatRoom = await getCommonChatRoomWithUser(user.id)
+        if (existingChatRoom) {
+            navigation.navigate('Chat', { id: existingChatRoom.id })
+            return
+        }
 
-        console.log(newChatRoomData)
+        const newChatRoomData = await API.graphql(graphqlOperation(createChatRoom, { input: {} }))
+        // console.log(newChatRoomData)
 
-        if(!newChatRoomData.data?.createChatRoom) {
+        if (!newChatRoomData.data?.createChatRoom) {
             console.log('error creating chat room')
         }
 
         const newChatRoom = newChatRoomData.data?.createChatRoom
 
         // ADD THE CLICKED USER TO THE CHATROOM
-        await API.graphql(graphqlOperation(createUserChatRoom, { input: {
-            chatRoomId: newChatRoom.id,
-            userId: user.id
-        } }))
+        await API.graphql(graphqlOperation(createUserChatRoom, {
+            input: {
+                chatRoomId: newChatRoom.id,
+                userId: user.id
+            }
+        }))
 
         // ADD THE AUTH TO THE CHATROOM
         const authUser = await Auth.currentAuthenticatedUser();
-        await API.graphql(graphqlOperation(createUserChatRoom, { input: {
-            chatRoomId: newChatRoom.id,
-            userId: authUser.attributes.sub
-        } }))
+        await API.graphql(graphqlOperation(createUserChatRoom, {
+            input: {
+                chatRoomId: newChatRoom.id,
+                userId: authUser.attributes.sub
+            }
+        }))
 
         // NAVIGATE TO THE NEWLY CREATED CHATROOM
         navigation.navigate('Chat', { id: newChatRoom.id })
@@ -76,7 +86,7 @@ const styles = StyleSheet.create({
     name: {
         fontWeight: 'bold'
     },
-    subTitle:{
+    subTitle: {
         color: 'gray'
     },
     content: {

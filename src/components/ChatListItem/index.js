@@ -1,14 +1,27 @@
 import { Image, StyleSheet, Text, View, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { Auth } from 'aws-amplify'
+import { useEffect, useState } from 'react'
+
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
 const ChatListItem = ({chat}) => {
 
-    const navigation = useNavigation()
+    const [user, setUser] = useState('')
 
-    const user = (chat.users.items[0].user)
+    useEffect(() => {
+        const fecthUser = async () => {
+            const authUser = await Auth.currentAuthenticatedUser()
+            const userItem = chat.users.items.find(item => item.user.id !== authUser.attributes.sub)
+            setUser(userItem?.user)
+        }
+
+        fecthUser()
+    }, [])
+
+    const navigation = useNavigation()
 
     return (
         <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: user?.name })} style={styles.container}>
