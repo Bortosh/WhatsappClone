@@ -8,18 +8,20 @@ const ChatListItem = ({chat}) => {
 
     const navigation = useNavigation()
 
+    const user = (chat.users.items[0].user)
+
     return (
-        <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: chat.user.name })} style={styles.container}>
+        <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: user?.name })} style={styles.container}>
             <Image
-                source={{ uri: chat.user.image }}
+                source={{ uri: user?.image }}
                 style={styles.image}
             />
             <View style={styles.content}>
                 <View style={styles.row}>
-                    <Text numberOfLines={1} style={styles.name}>{chat.user.name}</Text>
-                    <Text style={styles.subTitle}>{dayjs(chat.lastMessage.createdAt).fromNow(true)}</Text>
+                    <Text numberOfLines={1} style={styles.name}>{user?.name}</Text>
+                    <Text style={styles.subTitle}>{dayjs(chat.lastMessage?.createdAt).fromNow(true)}</Text>
                 </View>
-                <Text numberOfLines={2} style={styles.subTitle}>{chat.lastMessage.text}</Text>
+                <Text numberOfLines={2} style={styles.subTitle}>{chat.lastMessage?.text}</Text>
             </View>
         </Pressable>
     )
