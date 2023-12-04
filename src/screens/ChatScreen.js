@@ -4,7 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native'
 import Mesagge from '../components/Message'
 import InputBox from '../components/InputBox'
 import { API, graphqlOperation } from 'aws-amplify'
-import { getChatRoom } from '../graphql/queries'
+import { getChatRoom, listMessagesByChatRoom } from '../graphql/queries'
 
 import bg from '../../assets/images/BG.png'
 import messages from '../../assets/data/messages.json'
@@ -12,17 +12,28 @@ import messages from '../../assets/data/messages.json'
 const ChatScreen = () => {
 
     const [chatRoom, setChatRoom] = useState(null)
+    const [messages, setMessages] = useState([])
 
     const route = useRoute()
     const navigation = useNavigation()
 
     const chatRoomID = route.params.id
 
+    // FETCH CHAT ROOM
     useEffect(() => {
         API.graphql(graphqlOperation(getChatRoom, { id: chatRoomID })).then(
             result => setChatRoom(result.data?.getChatRoom)
         )
-    }, [])
+    }, [chatRoomID])
+    
+    // FETCH MESSAGES
+    useEffect(() => {
+        API.graphql(graphqlOperation(listMessagesByChatRoom, { chatroomID: chatRoomID, sortDirection: 'DESC'})).then(
+            result => {
+                setMessages(result.data?.listMessagesByChatRoom?.items)
+            }
+        )
+    }, [chatRoomID])
 
     useEffect(() => {
         navigation.setOptions({ title: route.params.name })
@@ -40,7 +51,7 @@ const ChatScreen = () => {
         >
             <ImageBackground source={bg} style={styles.bg}>
                 <FlatList
-                    data={chatRoom.Messages.items}
+                    data={messages}
                     renderItem={({ item }) => <Mesagge message={item} />}
                     style={styles.list}
                     inverted

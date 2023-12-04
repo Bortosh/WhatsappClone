@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
-const ChatListItem = ({chat}) => {
+const ChatListItem = ({ chat }) => {
     const navigation = useNavigation()
 
     const [user, setUser] = useState('')
@@ -22,8 +22,6 @@ const ChatListItem = ({chat}) => {
         fecthUser()
     }, [])
 
-    console.log(chat)
-
 
     return (
         <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: user?.name })} style={styles.container}>
@@ -34,7 +32,11 @@ const ChatListItem = ({chat}) => {
             <View style={styles.content}>
                 <View style={styles.row}>
                     <Text numberOfLines={1} style={styles.name}>{user?.name}</Text>
-                    <Text style={styles.subTitle}>{dayjs(chat.LastMessage?.createdAt).fromNow(true)}</Text>
+                    {
+                        chat.LastMessage && (
+                            <Text style={styles.subTitle}>{dayjs(chat.LastMessage?.createdAt).fromNow(true)}</Text>
+                        )
+                    }
                 </View>
                 <Text numberOfLines={2} style={styles.subTitle}>{chat.LastMessage?.text}</Text>
             </View>
@@ -55,20 +57,20 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         marginRight: 10
     },
-    content:{
+    content: {
         flex: 1,
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: 'lightgray'
     },
-    row:{
+    row: {
         flexDirection: 'row',
         marginBottom: 5
     },
-    name:{
+    name: {
         flex: 1,
         fontWeight: 'bold'
     },
-    subTitle:{
+    subTitle: {
         color: 'gray'
     },
 

@@ -20,7 +20,6 @@ const Mesagge = ({ message }) => {
         isMyMessage()
     }, [])
 
-    console.log('mensjae', message)
 
     return (
         <View style={[styles.container, {
