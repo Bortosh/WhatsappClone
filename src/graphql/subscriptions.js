@@ -164,6 +164,7 @@ export const onUpdateMessage = /* GraphQL */ `
       chatroomID
       userID
       updatedAt
+      favoritos
       __typename
     }
   }

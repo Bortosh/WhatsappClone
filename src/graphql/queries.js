@@ -140,6 +140,7 @@ export const listMessagesByChatRoom = /* GraphQL */ `
       items {
         id
         createdAt
+        favoritos
         text
         chatroomID
         userID

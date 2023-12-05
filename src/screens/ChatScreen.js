@@ -1,28 +1,32 @@
 import { useEffect, useState } from 'react'
-import { ImageBackground, StyleSheet, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native'
+import { View, ImageBackground, StyleSheet, FlatList, KeyboardAvoidingView, Modal, ActivityIndicator, Text, Button } from 'react-native'
 import { useRoute, useNavigation } from '@react-navigation/native'
 import Mesagge from '../components/Message'
 import InputBox from '../components/InputBox'
 import { API, graphqlOperation } from 'aws-amplify'
 import { getChatRoom, listMessagesByChatRoom } from '../graphql/queries'
+import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+
 import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions'
+import { EvilIcons } from '@expo/vector-icons';
+
 import { Feather } from '@expo/vector-icons'
 
 import bg from '../../assets/images/BG.png'
 import messages from '../../assets/data/messages.json'
+import CustomHeaderButton from '../components/CustomHeaderButton'
 
 const ChatScreen = () => {
 
     const [chatRoom, setChatRoom] = useState(null)
     const [messages, setMessages] = useState([])
 
-    console.log(JSON.stringify(messages))
+    // console.log(JSON.stringify(messages))
 
     const route = useRoute()
     const navigation = useNavigation()
 
     const chatRoomID = route.params.id
-    console.log("🚀 ~ file: ChatScreen.js:25 ~ ChatScreen ~ chatRoomID:", chatRoomID)
 
     // FETCH CHAT ROOM
     useEffect(() => {
@@ -66,16 +70,87 @@ const ChatScreen = () => {
 
     }, [chatRoomID])
 
+
+
+
+
+
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const openModal = () => {
+        setModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
+
+
+
+
+
     useEffect(() => {
-        navigation.setOptions({ title: route.params.name, headerRight: () => (
-        <Feather
-        onPress={() => navigation.navigate('Group Info', {id: chatRoomID})}
-        name="more-vertical" 
-        size={24} 
-        color="gray" 
-        />
-        ) })
-    }, [route.params.name, chatRoomID])
+        navigation.setOptions({
+            title: route.params.name,
+            headerRight: () => (
+                <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+                    <Item
+                        title="GroupInfo"
+                        iconName="more-vertical"
+                        onPress={() => navigation.navigate('Group Info', { id: chatRoomID })}
+                    />
+                    <Item
+                        title="Star"
+                        iconName="star"
+                        onPress={() => {
+                            openModal()
+                        }}
+                    />
+                </HeaderButtons>
+            ),
+        });
+    }, [route.params.name, chatRoomID]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // useEffect(() => {
+    //     navigation.setOptions({ title: route.params.name, headerRight: () => (
+    //     <Feather
+    //     onPress={() => navigation.navigate('Group Info', {id: chatRoomID})}
+    //     name="more-vertical" 
+    //     size={24} 
+    //     color="gray" 
+    //     />
+
+    //     ) })
+    // }, [route.params.name, chatRoomID])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     if (!chatRoom) {
         return <ActivityIndicator />
@@ -87,7 +162,24 @@ const ChatScreen = () => {
             // behavior={Platform.OS === 'ios' ? 60 : 90}
             style={styles.bg}
         >
+
             <ImageBackground source={bg} style={styles.bg}>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible} // Utiliza la variable de estado para controlar la visibilidad
+                    onRequestClose={closeModal}
+                >
+                    {/* Contenido del modal */}
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text>Contenido del Modal</Text>
+                            <Button title="Cerrar Modal" onPress={closeModal} />
+                        </View>
+                    </View>
+                </Modal>
+
                 <FlatList
                     data={messages}
                     renderItem={({ item }) => <Mesagge message={item} />}
