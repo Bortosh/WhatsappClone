@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { StyleSheet, FlatList, View, Text, ActivityIndicator, Alert } from 'react-native'
 import { useRoute } from '@react-navigation/native'
+import { deleteUserChatRoom } from '../graphql/mutations'
 
 import { API, graphqlOperation } from 'aws-amplify'
 import { onUpdateChatRoom } from '../graphql/subscriptions'
@@ -9,10 +10,15 @@ import ContactListItem from '../components/ContactListItem'
 const ChatRoomInfo = () => {
 
     const [chatRoom, setChatRoom] = useState(null)
+    const [userToDelete, setUsersToDelete] = useState([])
+    const [users, setUsers] = useState([])
+
+    // console.log(JSON.stringify(users))
+
     const route = useRoute()
-
+    
     const chatroomID = route.params.id
-
+    
     useEffect(() => {
         API.graphql(graphqlOperation(getChatRoom, { id: chatroomID })).then(
             (result) => {
@@ -36,19 +42,52 @@ const ChatRoomInfo = () => {
         return () => subscription.unsubscribe()
     }, [chatroomID])
 
+    const removeChatRoomUser = async (chatRoomUser) => {
+        setUsersToDelete(chatRoomUser.id)
+        // NO HAGO LA ELIMINACION REAL EN LA BASE DE DATOS PORQUE REALMENTE NO SE ELIMINA DE LA BASE DE DATOS, QUE HACE ES PASAR A UN ESTADO TTL (TIME TO LEAVE)
+        // EL CUAL SIGNIFICA QUE VA A SER ELIMINADO DE LA BASE DE DATOS EN UN PERIODO DE TIEMPO DE 30 DIAS, ENTONCES AUN PERMANECE EN LA BASE DE DATOS
+        // PARA SOLVENTAR ESTE TEMA, POR AHORA LREALICE LA ELIMINACION MANUAL Y LOGICA, PERO NO CON BASE DE DATOS Y MUTATIONS,
+        // LO QUE TENGO QUE HACER ES CREAR UNA PROPIEDAD LLAMADA "ELIMINADO" Y ESTA PASE A TRUE EN EL CASO DE QUE HAYA SIDO ELIMINADO
+        // EL USUARIO
+
+        // const response = await API.graphql(graphqlOperation(deleteUserChatRoom, {input: {id: chatRoomUser.id}}))
+    }
+
+    const onContactPress = (chatRoomUser) => {
+        Alert.alert('Removing the user', `Are you sure you want to remove ${chatRoomUser.user.name} from this group`,
+    [
+        {
+            text: 'Cancel',
+            style: 'cancel'
+        },
+        {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: () => removeChatRoomUser(chatRoomUser)
+        }
+    ]
+        )
+    }
+
     if (!chatRoom) {
         return <ActivityIndicator />
+    }
+    
+    if(userToDelete !== '') {
+        const usuarios = chatRoom.users.items.filter(item => item.id !== userToDelete)
+        setUsers(usuarios)
+        setUsersToDelete('')
     }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{chatRoom.name}</Text>
 
-            <Text style={styles.sectionTitle}>{chatRoom.users.items.length} Participants</Text>
+            <Text style={styles.sectionTitle}>{users.length} Participants</Text>
             <View style={styles.section}>
                 <FlatList
-                    data={chatRoom.users.items}
-                    renderItem={({ item }) => <ContactListItem user={item.user} />}
+                    data={users}
+                    renderItem={({ item }) => <ContactListItem user={item.user} onPress={() => onContactPress(item)} />}
                 />
             </View>
         </View>

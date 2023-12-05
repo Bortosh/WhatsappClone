@@ -16,11 +16,13 @@ const ChatScreen = () => {
     const [chatRoom, setChatRoom] = useState(null)
     const [messages, setMessages] = useState([])
 
+    console.log(JSON.stringify(messages))
 
     const route = useRoute()
     const navigation = useNavigation()
 
     const chatRoomID = route.params.id
+    console.log("🚀 ~ file: ChatScreen.js:25 ~ ChatScreen ~ chatRoomID:", chatRoomID)
 
     // FETCH CHAT ROOM
     useEffect(() => {

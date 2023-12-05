@@ -16,7 +16,8 @@ const InputBox = ({ chatroom }) => {
         const newMessage = {
             chatroomID: chatroom.id,
             text,
-            userID: authUser.attributes.sub
+            userID: authUser.attributes.sub,
+            favoritos: false
         }
 
         const newMessageData = await API.graphql(graphqlOperation(
