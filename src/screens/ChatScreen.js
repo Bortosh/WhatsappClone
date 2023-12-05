@@ -6,6 +6,7 @@ import InputBox from '../components/InputBox'
 import { API, graphqlOperation } from 'aws-amplify'
 import { getChatRoom, listMessagesByChatRoom } from '../graphql/queries'
 import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions'
+import { Feather } from '@expo/vector-icons'
 
 import bg from '../../assets/images/BG.png'
 import messages from '../../assets/data/messages.json'
@@ -64,8 +65,15 @@ const ChatScreen = () => {
     }, [chatRoomID])
 
     useEffect(() => {
-        navigation.setOptions({ title: route.params.name })
-    }, [route.params.name])
+        navigation.setOptions({ title: route.params.name, headerRight: () => (
+        <Feather
+        onPress={() => navigation.navigate('Group Info', {id: chatRoomID})}
+        name="more-vertical" 
+        size={24} 
+        color="gray" 
+        />
+        ) })
+    }, [route.params.name, chatRoomID])
 
     if (!chatRoom) {
         return <ActivityIndicator />

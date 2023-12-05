@@ -29,8 +29,7 @@ const NewGroupScreen = () => {
     }, [name, selectedUserIds])
 
     const onCreateGroupPress = async () => {
-console.log('adentro')
-        const newChatRoomData = await API.graphql(graphqlOperation(createChatRoom, { input: {} }))
+        const newChatRoomData = await API.graphql(graphqlOperation(createChatRoom, { input: {name} }))
         // console.log(newChatRoomData)
 
         if (!newChatRoomData.data?.createChatRoom) {

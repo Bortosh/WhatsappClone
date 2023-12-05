@@ -17,7 +17,7 @@ const ContactListItem = ({ user, onPress = () => {}, selectable = false, isSelec
     return (
         <Pressable onPress={onPress} style={styles.container}>
             <Image
-                source={{ uri: user.image }}
+                source={{ uri: user?.image }}
                 style={styles.image}
             />
             <View style={styles.content}>
