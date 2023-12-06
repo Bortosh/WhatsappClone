@@ -8,20 +8,31 @@ import { getChatRoom, listMessagesByChatRoom } from '../graphql/queries'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 
 import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions'
-import { EvilIcons } from '@expo/vector-icons';
-
-import { Feather } from '@expo/vector-icons'
 
 import bg from '../../assets/images/BG.png'
-import messages from '../../assets/data/messages.json'
 import CustomHeaderButton from '../components/CustomHeaderButton'
+import ListFavoritos from '../components/ListFavoritos.js'
 
 const ChatScreen = () => {
 
     const [chatRoom, setChatRoom] = useState(null)
     const [messages, setMessages] = useState([])
+    const [modalVisible, setModalVisible] = useState(false);
+    const [allFavoritos, setAllFavoritos] = useState({})
 
-    // console.log(JSON.stringify(messages))
+
+    // console.log(JSON.stringify(allFavoritos.data.listMessagesByChatRoom.items))
+
+    const fetchFavoritos = async () => {
+        const response = await API.graphql(graphqlOperation(listMessagesByChatRoom, { chatroomID: chatRoom.id, filter: { favoritos: { eq: true } } }))
+        setAllFavoritos(response)
+    }
+    useEffect(() => {
+        if (chatRoom) {
+            fetchFavoritos()
+        }
+
+    }, [chatRoom])
 
     const route = useRoute()
     const navigation = useNavigation()
@@ -70,13 +81,6 @@ const ChatScreen = () => {
 
     }, [chatRoomID])
 
-
-
-
-
-
-    const [modalVisible, setModalVisible] = useState(false);
-
     const openModal = () => {
         setModalVisible(true);
     };
@@ -84,11 +88,6 @@ const ChatScreen = () => {
     const closeModal = () => {
         setModalVisible(false);
     };
-
-
-
-
-
 
     useEffect(() => {
         navigation.setOptions({
@@ -113,45 +112,6 @@ const ChatScreen = () => {
     }, [route.params.name, chatRoomID]);
 
 
-
-
-
-
-
-
-
-
-
-
-
-    // useEffect(() => {
-    //     navigation.setOptions({ title: route.params.name, headerRight: () => (
-    //     <Feather
-    //     onPress={() => navigation.navigate('Group Info', {id: chatRoomID})}
-    //     name="more-vertical" 
-    //     size={24} 
-    //     color="gray" 
-    //     />
-
-    //     ) })
-    // }, [route.params.name, chatRoomID])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if (!chatRoom) {
         return <ActivityIndicator />
     }
@@ -164,20 +124,34 @@ const ChatScreen = () => {
         >
 
             <ImageBackground source={bg} style={styles.bg}>
-
                 <Modal
                     animationType="slide"
                     transparent={true}
-                    visible={modalVisible} // Utiliza la variable de estado para controlar la visibilidad
+                    visible={modalVisible}
                     onRequestClose={closeModal}
                 >
                     {/* Contenido del modal */}
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <Text>Contenido del Modal</Text>
-                            <Button title="Cerrar Modal" onPress={closeModal} />
+                    <ImageBackground source={bg} style={styles.bg}>
+                        <View style={styles.modalContainer}>
+                            <View style={styles.subContainer}>
+                                <Text style={styles.textFavoritos}>Favoritos</Text>
+                                <View style={styles.boxBtn}>
+                                    <Text style={styles.btn} onPress={closeModal}>X</Text>
+                                </View>
+                            </View>
+                            <View style={styles.modalContent}>
+                                {
+                                    allFavoritos.data?.listMessagesByChatRoom?.items.length === 0
+                                        ? <Text style={styles.warningText}>No hay favoritos</Text>
+                                        :
+                                        <FlatList
+                                            data={allFavoritos.data?.listMessagesByChatRoom?.items}
+                                            renderItem={({ item }) => <ListFavoritos item={item} />}
+                                        />
+                                }
+                            </View>
                         </View>
-                    </View>
+                    </ImageBackground>
                 </Modal>
 
                 <FlatList
@@ -198,23 +172,54 @@ const styles = StyleSheet.create({
     },
     list: {
         padding: 10
+    },
+    modalContainer: {
+        justifyContent: 'center',
+        alignSelf: 'center',
+        alignItems: 'center',
+        width: 350,
+        height: 500,
+        top: 150,
+        borderRadius: 20,
+        maxHeight: '80%',
+        overflow: 'hidden',
+    },
+    modalContent: {
+        margin: 10,
+        minWidth: '60%',
+        flexDirection: 'row',
+        flex: 1,
+        overflow: 'hidden',
+    },
+    btn: {
+        color: '#000',
+        fontSize: 20,
+        left: 8.5
+    },
+    boxBtn: {
+        backgroundColor: '#ECE5DD80',
+        width: 30,
+        borderRadius: 4
+    },
+    subContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        margin: 10,
+        width: '80%',
+        alignItems: 'center',
+    },
+    textFavoritos: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        color: '#4b793f',
+        left: 80
+    },
+    warningText: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        alignSelf: 'center',
     }
 })
 
 export default ChatScreen;
 
-
-
-// SUBSCRIBE TO NEW MESSAGES
-//     const subscription = API.graphql(graphqlOperation(onCreateMessage, {
-//         filter: {chatRoomID: { eq: chatRoomID }}
-//     })).subscribe({
-//         next: ({ value }) => {
-//             setMessages((m) => [value.data.onCreateMessage, ...m])
-//         },
-//         error: (err) => console.warn(err)
-//     })
-
-//     return () => subscription.unsubscribe()
-
-// }, [chatRoomID])
