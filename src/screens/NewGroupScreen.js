@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, TextInput, StyleSheet, Button } from 'react-native'
+import { View, FlatList, TextInput, StyleSheet, Button } from 'react-native'
 import ContactListItem from '../components/ContactListItem'
 import { API, graphqlOperation, Auth } from 'aws-amplify'
 import { listUsers } from '../graphql/queries'
@@ -30,7 +30,6 @@ const NewGroupScreen = () => {
 
     const onCreateGroupPress = async () => {
         const newChatRoomData = await API.graphql(graphqlOperation(createChatRoom, { input: {name} }))
-        // console.log(newChatRoomData)
 
         if (!newChatRoomData.data?.createChatRoom) {
             console.log('error creating chat room')
@@ -39,7 +38,6 @@ const NewGroupScreen = () => {
         const newChatRoom = newChatRoomData.data?.createChatRoom
 
         // ADD THE SELECTED USERS TO THE CHATROOM
-
         await Promise.all(
             selectedUserIds.map((userID) =>
                 API.graphql(graphqlOperation(createUserChatRoom, {

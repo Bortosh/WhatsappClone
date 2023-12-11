@@ -1,44 +1,11 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { Auth, API, graphqlOperation } from 'aws-amplify'
 import { Entypo } from '@expo/vector-icons';
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useEffect, useState } from 'react'
-import { updateMessage } from '../../graphql/mutations'
 
 dayjs.extend(relativeTime)
 
-const Mesagge = ({ message }) => {
-
-
-    const [isMe, setIsMe] = useState(false)
-    const [favorito, setFavorito] = useState(message.favoritos)
-
-    const isMyMessage = async () => {
-
-        const authUser = await Auth.currentAuthenticatedUser()
-
-        setIsMe(message.userID === authUser.attributes.sub)
-    }
-
-    useEffect(() => {
-        isMyMessage()
-    }, [])
-
-    const addToFavorites = async () => {
-        try {
-            setFavorito((prevFavorito) => !prevFavorito);
-            
-            if (favorito) {
-                await API.graphql(graphqlOperation(updateMessage, { input: { id: message.id, favoritos: false } }))
-            } else {
-                await API.graphql(graphqlOperation(updateMessage, { input: { id: message.id, favoritos: true } }))
-            }
-
-        } catch (error) {
-            console.error(error);
-        }
-    };
+const MesaggePresentational = ({ message, addToFavorites, isMe, favorito }) => {
 
     return (
         <View style={[styles.container, {
@@ -77,4 +44,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Mesagge;
+export default MesaggePresentational;

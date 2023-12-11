@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet } from 'react-native'
+import { TextInput, StyleSheet } from 'react-native'
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -31,23 +31,18 @@ const InputBox = ({ chatroom }) => {
             updateChatRoom, {
             input: {
                 _version: chatroom._version,
-                chatRoomLastMessageId: newMessageData.data.createMessage.id, 
+                chatRoomLastMessageId: newMessageData.data.createMessage.id,
                 id: chatroom.id
             }
         })
         )
-
     }
 
     return (
         <SafeAreaView style={styles.container} edges={['bottom']} >
-
             <AntDesign name='plus' size={20} color='royalblue' />
-
             <TextInput style={styles.input} placeholder='type your message...' value={text} onChangeText={setText} />
-
             <MaterialIcons style={styles.send} name='send' size={16} color='white' onPress={onSend} />
-
         </SafeAreaView>
     )
 }
@@ -59,7 +54,6 @@ const styles = StyleSheet.create({
         padding: 6,
         paddingHorizontal: 10,
         alignItems: 'center',
-        // marginBottom: -20   //MAYBE ITS NEEDS TO REMOVE FROM HERE
     },
     input: {
         flex: 1,

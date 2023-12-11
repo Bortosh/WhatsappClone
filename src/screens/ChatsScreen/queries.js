@@ -29,3 +29,53 @@ export const listChatRooms = /* GraphQL */ `
         }
     }
 `;
+
+export const getChatRoom = /* GraphQL */ `
+    query GetChatRoom($id: ID!) {
+        getChatRoom(id: $id) {
+        id
+        updatedAt
+        users {
+            items {
+            id
+            chatRoomId
+            userId
+            createdAt
+            updatedAt
+            user {
+                id
+                name
+                status
+                image
+            }
+            }
+            nextToken
+        }
+        createdAt
+        chatRoomLastMessageId
+        name
+        }
+    }
+`;
+
+export const listChatRoomsServices = /* GraphQL */  `
+    query GetUser($id: ID!) {
+        getUser(id: $id) {
+            id
+            ChatRooms {
+                items {
+                    chatRoom {
+                        id
+                        users {
+                            items {
+                                user {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+`;

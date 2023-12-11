@@ -42,8 +42,6 @@ function App() {
 
   return (
     <View style={styles.container}>
-      {/* <ChatsScreen /> */}
-      {/* <ChatScreen /> */}
       <Navigator />
       <StatusBar style="auto" />
     </View>

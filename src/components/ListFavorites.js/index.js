@@ -1,9 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 
-const ListFavoritos = ({item}) => {
-
-    // console.log(JSON.stringify(item))
+const ListFavorites = ({item}) => {
 
     return (
         <View style={styles.container}>
@@ -21,4 +19,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ListFavoritos;
+export default ListFavorites;

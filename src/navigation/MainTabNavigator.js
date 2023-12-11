@@ -7,9 +7,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 const Tab = createBottomTabNavigator()
 
 const MainTabNavigator = () => {
-
-
-
     return (
         <Tab.Navigator initialRouteName='Chats' screenOptions={{
             tabBarStyle: { backgroundColor: 'whitesmoke' },

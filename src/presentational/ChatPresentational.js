@@ -1,86 +1,19 @@
-import { useEffect, useState } from 'react'
-import { View, ImageBackground, StyleSheet, FlatList, KeyboardAvoidingView, Modal, ActivityIndicator, Text } from 'react-native'
+import { useEffect } from 'react'
+import { View, ImageBackground, StyleSheet, FlatList, KeyboardAvoidingView, Modal, Text } from 'react-native'
 import { useRoute, useNavigation } from '@react-navigation/native'
+import Mesagge from '../components/Message'
 import InputBox from '../components/InputBox'
-import { API, graphqlOperation } from 'aws-amplify'
-import { getChatRoom, listMessagesByChatRoom } from '../graphql/queries'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
-
-import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions'
 
 import bg from '../../assets/images/BG.png'
 import CustomHeaderButton from '../components/CustomHeaderButton'
-import ListFavoritos from '../components/ListFavoritos.js'
-import MesaggeContainer from '../container/MessageContainer.js'
+import ListFavorites from '../components/ListFavorites.js/index.js'
 
-const ChatScreen = () => {
-
-    const [chatRoom, setChatRoom] = useState(null)
-    const [messages, setMessages] = useState([])
-    const [modalVisible, setModalVisible] = useState(false);
-    const [allFavoritos, setAllFavoritos] = useState({})
-
-    const fetchFavoritos = async () => {
-        const response = await API.graphql(graphqlOperation(listMessagesByChatRoom, { chatroomID: chatRoom.id, filter: { favoritos: { eq: true } } }))
-        setAllFavoritos(response)
-    }
-    useEffect(() => {
-        if (chatRoom) {
-            fetchFavoritos()
-        }
-
-    }, [chatRoom])
+const ChatPresentational = ({openModal, closeModal, modalVisible, allFavoritos, messages, chatRoom, chatRoomID}) => {
 
     const route = useRoute()
+
     const navigation = useNavigation()
-
-    const chatRoomID = route.params.id
-
-    // FETCH CHAT ROOM
-    useEffect(() => {
-        API.graphql(graphqlOperation(getChatRoom, { id: chatRoomID })).then(
-            result => setChatRoom(result.data?.getChatRoom)
-        )
-
-        const subscription = API.graphql(graphqlOperation(onUpdateChatRoom, { filter: { id: { eq: chatRoomID } } })
-        ).subscribe({
-            next: ({ value }) => {
-                setChatRoom((cr) => ({
-                    ...(cr || {}),
-                    ...value.data.onUpdateChatRoom
-                }))
-            },
-            error: err => console.warn(err)
-        })
-
-        return () => subscription.unsubscribe()
-    }, [chatRoomID])
-
-    // FETCH MESSAGES
-    useEffect(() => {
-        API.graphql(graphqlOperation(listMessagesByChatRoom, { chatroomID: chatRoomID, sortDirection: 'DESC' })).then(
-            result => {
-                setMessages(result.data?.listMessagesByChatRoom?.items)
-            }
-        )
-        const subscription = API.graphql(graphqlOperation(onCreateMessage)).subscribe({
-            next: ({ value }) => {
-                setMessages((m) => [value.data.onCreateMessage, ...m])
-            },
-            error: (err) => console.warn(err)
-        })
-
-        return () => subscription.unsubscribe()
-
-    }, [chatRoomID])
-
-    const openModal = () => {
-        setModalVisible(true);
-    };
-
-    const closeModal = () => {
-        setModalVisible(false);
-    };
 
     useEffect(() => {
         navigation.setOptions({
@@ -105,10 +38,6 @@ const ChatScreen = () => {
     }, [route.params.name, chatRoomID]);
 
 
-    if (!chatRoom) {
-        return <ActivityIndicator />
-    }
-
     return (
 
         <KeyboardAvoidingView
@@ -122,6 +51,7 @@ const ChatScreen = () => {
                     visible={modalVisible}
                     onRequestClose={closeModal}
                 >
+                    {/* Contenido del modal */}
                     <ImageBackground source={bg} style={styles.bg}>
                         <View style={styles.modalContainer}>
                             <View style={styles.subContainer}>
@@ -137,7 +67,7 @@ const ChatScreen = () => {
                                         :
                                         <FlatList
                                             data={allFavoritos.data?.listMessagesByChatRoom?.items}
-                                            renderItem={({ item }) => <ListFavoritos item={item} />}
+                                            renderItem={({ item }) => <ListFavorites item={item} />}
                                         />
                                 }
                             </View>
@@ -147,7 +77,7 @@ const ChatScreen = () => {
 
                 <FlatList
                     data={messages}
-                    renderItem={({ item }) => <MesaggeContainer message={item} />}
+                    renderItem={({ item }) => <Mesagge message={item} />}
                     style={styles.list}
                     inverted
                 />
@@ -156,6 +86,7 @@ const ChatScreen = () => {
         </KeyboardAvoidingView>
     )
 }
+
 
 const styles = StyleSheet.create({
     bg: {
@@ -212,5 +143,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ChatScreen;
-
+export default ChatPresentational;

@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react'
-import { FlatList, Text, Pressable } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
-import ContactListItem from '../components/ContactListItem'
 import { API, graphqlOperation, Auth } from 'aws-amplify'
 import { listUsers } from '../graphql/queries'
 import { useNavigation } from '@react-navigation/native'
 import { createChatRoom, createUserChatRoom } from '../graphql/mutations'
 import { getCommonChatRoomWithUser } from '../services/chatRoomService'
+import ContactsPresentational from '../presentational/ContactsPresentational'
 
-const ContactsScreen = () => {
+const ContactsContainer = () => {
 
     const navigation = useNavigation()
 
@@ -59,37 +57,11 @@ const ContactsScreen = () => {
     }
 
     return (
-        <FlatList
-            data={users}
-            renderItem={({ item }) => <ContactListItem user={item} onPress={() => createAChatRoomWithTheUSer(item)} />}
-            style={{ backgroundColor: 'white' }}
-            ListHeaderComponent={() => (
-                <Pressable
-                    onPress={() => { navigation.navigate('New Group') }}
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        padding: 15,
-                        paddingHorizontal: 20
-                    }}
-                >
-                    <MaterialIcons
-                        name='group'
-                        size={24}
-                        color='royalblue'
-                        style={{
-                            marginRight: 20,
-                            backgroundColor: 'gainsboro',
-                            padding: 7,
-                            borderRadius: 20,
-                            overflow: 'hidden'
-                        }}
-                    />
-                    <Text style={{ color: 'royalblue', fontSize: 16 }}>New Group</Text>
-                </Pressable>
-            )}
+        <ContactsPresentational
+            createAChatRoomWithTheUSer={createAChatRoomWithTheUSer}
+            users={users}
         />
     )
 }
 
-export default ContactsScreen;
+export default ContactsContainer;
